@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>JS - 중급 (Storage)</title>
+</head>
+<body>
+
+<span onclick="product('1','LG냉장고')">LG 냉장고</span><br>
+<span onclick="product('2','LG에어컨')">LG 에어컨</span><br>
+<input type="button" value="스토리지 추가" onclick="abc()">
+
+</body>
+
+<script>
+function abc(){
+	//백엔드가 준 배열을 프론트가 여기 저장함
+	
+	//어떤 홈페이지에 들어가서 최근 본상품 주루룩 저장된거
+	//나갔다 들어왔는데도 남아있으면 로컬스토리지
+	//나갔다와서 사라져있으면 세션스토리지
+	
+	localStorage.setItem("mid","hong");
+	sessionStorage.setItem("midx",50);
+} 
+
+
+/*
+Storage 사용법
+	localStorage : 해당 도메인 기준으로 메모리에 저장시키는 방식  (지속적으로 기억시킴) (10MB)
+	sessionStorage : localStorage와 동일한 형태이지만 브라우저 닫을 경우 또는 신규탭으로 출력시 데이터 손실 (10MB)
+	extensionStorage : API 데이터를 storage에 저장시켜서 웹페이지에 출력하는 방식 (5MB)	
+*/
+
+function product(pdnum, pdname){
+	//setItem : 해당 값을 key 이름에 맞춰서 저장을 함, 동일한 key 이름 사용시 데이터 값이 수정됨 
+	localStorage.setItem("userpd"+pdnum,pdname);
+	sessionStorage.setItem("userpd"+pdnum,pdname);
+	location.href = './js_middle2.html';
+	
+	/*
+	sessionStorage.setItem("userpd",pdname);
+	location.href = './js_middle2.html';
+	//페이지가 이동돼도 스토리지 공유함 (뒤로가기도 가능) 
+	//창을 완전히 닫지않는이상 계속저장됨 
+	//대신 키가 같은 다른거 넣으면 덮어써져버려서 기존 데이터 사라짐 
+	*/
+	
+	
+}
+
+</script>
+
+</html>
