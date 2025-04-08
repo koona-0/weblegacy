@@ -2,20 +2,31 @@ package api;
 
 import java.io.PrintWriter;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletResponse;
 
+import org.apache.ibatis.javassist.bytecode.analysis.MultiArrayType;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.json.JSONParserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.mysql.cj.xdevapi.JsonParser;
 
@@ -263,7 +274,144 @@ public class api_controller {
 		
 		return null;
 	}
+	
+	/*============================================================================*/
 
+	// ECMA - Ajax (get)
+	@GetMapping("/ajax/ajax9.do")
+	public String ajax9(@RequestParam(name="mid") String mid, ServletResponse res) {
+		try {
+			this.logger.info(mid);
+			this.pw = res.getWriter();
+			this.pw.write("ok");
+			
+		} catch (Exception e) {
 
+		}
+
+		return null;
+	}
+
+	// ECMA - Ajax (post)
+	@PostMapping("/ajax/ajax10.do")
+	public String ajax10(@RequestParam(name = "mid") String mid, ServletResponse res) {
+		try {
+			this.logger.info(mid);
+			this.pw = res.getWriter();
+			this.pw.write("ok");
+
+		} catch (Exception e) {
+
+		}
+
+		return null;
+	}
+
+	// ECMA - Ajax (post) : 배열 전송
+	@PostMapping("/ajax/ajax11.do")
+	public String ajax11(@ModelAttribute api_dto dto, ServletResponse res) {
+		try {
+			this.logger.info(dto.getMname().toString());
+			this.logger.info(dto.getMid().toString());
+
+			this.pw = res.getWriter();
+			this.pw.write("ok");
+
+		} catch (Exception e) {
+
+		}
+
+		return null;
+	}
+	
+	//Ajax(PATCH) - API Server
+	//@PathVariable : URL에 파라미터 값을 가져오는 어노테이션 {~} 
+	//				가상의 파라미터값 {여기}랑 name="여기" 같아야함 딱하나만 사용가능  
+	//				JSON.stringify에 대한 정보값을 처리하지 못함 
+	@PatchMapping("/ajax/ajax12.do/{data}")
+//	public String ajax12(@PathVariable(name="data") String mid, ServletResponse res) {	//하나만 보낼때, 배열로 보낼때 
+	public String ajax12(
+			@PathVariable(name="data") String data, 
+			@RequestBody String myinfo,
+			ServletResponse res) {	//JSON으로 보낼때 
+		try {
+			/*하나만 보낼때, 배열로 보낼때 
+			String user[] = mid.split(",");
+			this.logger.info(user[1]);
+			this.logger.info(user[2]);
+			*/
+			
+			this.pw = res.getWriter();
+			if(data.equals("patch_myinfo")) {
+				this.logger.info(myinfo);
+				this.pw.write("ok");
+			}else {
+				this.pw.write("error");
+			}
+			
+			
+			
+
+		} catch (Exception e) {
+
+		}
+		return null;
+	}
+	
+	
+	//@RequestPart : MultipartFile 로 받을때 사용
+	//@RequestParam : name 또는 파라미터 
+	//@ResponseBody + @Mapping : method 선언시 사용 
+	//@ResponseBody : 응답에 대한 결과값을 해당 메소드에 바로 출력할 때 사용
+	//@RequestBody : 베열값을 처리하는 어노테이션 
+	@DeleteMapping("/ajax/ajax13/{key}")
+//			@RequestBody String midx
+	//formdata => 헤더:urlencoded,send에태워서  @RequestBody로 받
+	
+	//@RequestParam Map<Object,Object> midx	//방법2 
+	//@RequestBody String midx 	//방법1
+	   public String ajax13(ServletResponse res, 		//DELETE
+	            @PathVariable(name = "key") String key,
+	            @RequestBody String midx
+	            //@RequestBody String midx 
+	               ) {
+	         try {
+	            this.pw = res.getWriter();
+	            if (key.equals("a123456")) {
+	               this.logger.info(midx);
+	               
+	               this.pw.write("delete_ok");
+	            } else {
+	               this.pw.write("key error");
+	            }
+	         } catch (Exception e) {
+	            this.pw.write("error");
+	         }
+	         return null;
+	      }
+	      
+
+	//@RequestBody String data : 정상적으로 값을 받아서 출력 확인 
+	@PutMapping("/ajax/ajax14/{key}")		//insert (DTO기본)
+	public String ajax14(ServletResponse res, @PathVariable(name = "key") String key,
+			@RequestBody String data
+			) {
+		try {
+			this.pw = res.getWriter();
+			if (key.equals("a123456")) {
+				this.logger.info(data.toString());
+//				this.logger.info(jo.getString("pd1"));
+				this.pw.write("ok");
+
+			} else {
+				this.pw.write("key error");
+			}
+
+		} catch (Exception e) {
+
+		}
+		return null;
+	}
+	
 
 }
