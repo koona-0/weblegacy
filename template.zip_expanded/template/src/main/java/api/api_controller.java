@@ -1,16 +1,15 @@
 package api;
 
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.servlet.ServletResponse;
 
-import org.apache.ibatis.javassist.bytecode.analysis.MultiArrayType;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONParserConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -22,14 +21,36 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.multipart.MultipartFile;
 
-import com.mysql.cj.xdevapi.JsonParser;
+/*
+@PutMapping		C
+@DeleteMapping	D
+@PatchMapping	U
 
+API서버에서 받아서 디비에 넣어야해서 Rest형태로 만들어서 작동시킴  
+예 ) /api/data.do/{data}
+
+=> 주로 배열로 처리해서 파라미터 형식으로 보냄 
+=> 컨트롤 눌러서 들어가보면 파라미터로 받는게 JSON이랑 디티오같은게 없음 (맞나? 영상다시보기)
+
+Jackson
+	DTO로 받으려면 Jackson -> Ajax-> JSON
+	Spring-boot가면 Jackson 필요없음 
+	Jackson의 치명적인 단점 : 
+GSON : 구글에서 제공하는 라이브러리 
+
+==========통신 방식이 다름===========
+
+@GetMapping, @PostMapping	R 
+=> HTML 형식으로 Server에 전송 (name="")형태 
+=> JSON 허락
+
+예) /api/data.do 
+
+*/
+
+//api서버를 만든다?면? restcontroller써야함 
 @Controller
 public class api_controller {
 
@@ -47,6 +68,9 @@ public class api_controller {
 
 	// js - Ajax(GET)
 	PrintWriter pw = null;
+	
+	@Resource(name="api_dao")
+	api_dao dao;
 
 	// 문자열 + ok, no, error
 	@GetMapping("/ajax/ajax1.do")
@@ -392,6 +416,7 @@ public class api_controller {
 	      
 
 	//@RequestBody String data : 정상적으로 값을 받아서 출력 확인 
+	//@RequestParam : Put에서 절대 안받아짐 
 	@PutMapping("/ajax/ajax14/{key}")		//insert (DTO기본)
 	public String ajax14(ServletResponse res, @PathVariable(name = "key") String key,
 			@RequestBody String data
@@ -399,10 +424,25 @@ public class api_controller {
 		try {
 			this.pw = res.getWriter();
 			if (key.equals("a123456")) {
-				this.logger.info(data.toString());
-//				this.logger.info(jo.getString("pd1"));
-				this.pw.write("ok");
-
+				this.logger.info(data);
+				
+				//String => Map 해서 저장 
+				Map<String,String> mp = new HashMap<String, String>();
+				JSONObject jo = new JSONObject(data);
+				Iterator<String> keys = jo.keys();	//Iterator : 키만 뽑는 인터페이스 
+				while(keys.hasNext()) {
+					String keynm = keys.next();		//키명
+					mp.put(keynm, jo.getString(keynm).toString());
+				}
+//				this.logger.info(mp.toString());
+				int result = this.dao.api_mapper(mp);
+//				this.logger.info(String.valueOf(result));
+				if(result > 0) {
+					this.pw.write("ok");	//프론트에서 Ajax로 보내오면 백은 pw.write로 메세지를 적어줌! alert는 프론트가 처리함!
+				}else {
+					this.pw.write("no");
+				}
+				
 			} else {
 				this.pw.write("key error");
 			}
@@ -412,6 +452,5 @@ public class api_controller {
 		}
 		return null;
 	}
-	
 
 }
