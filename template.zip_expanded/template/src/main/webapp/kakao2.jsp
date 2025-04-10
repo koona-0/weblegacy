@@ -7,12 +7,18 @@
 <title>로그인및 외부 API 로그인 방식(Kakao)</title>
 </head>
 <body>
+
 	<form id="frm" method="post" action="./ajax/web_loginok.do">
-		<input type="hidden" name="code" value="1"> 아이디 : <input
-			type="text" name="mid"><br> 패스워드 : <input
-			type="password" name="mpass"><br> <input type="submit"
-			value="로그인">
+	<!-- code = 1일반로그인 2카카오로그인 -->
+		<input type="hidden" name="code" value="1">
+		<input type="hidden" name="kakao_id" value="">
+		<input type="hidden" name="kakao_nicknm" value="">
+		
+		 아이디 : <input type="text" name="mid"><br> 
+		 패스워드 : <input type="password" name="mpass"><br> 
+		 <input type="submit" value="로그인">
 	</form>
+	
 	<br>
 	<br>
 	<img src="./ajax/kakao_login.png" onclick="kakao_login()">
@@ -30,6 +36,12 @@
 					url : '/v2/user/me',	// 사용자 정보 가져오기
 					success : function(response) {	//API서버에서 가입정보를 가져옴 
 						console.log(response);
+						let id = response["id"];		//고유값 
+						let nickname = response["kakao_account"]["profile"]["nickname"];		//카카오 닉네임
+						frm.code.value = "2";
+						frm.kakao_id.value = id;
+						frm.kakao_nicknm.value = nickname;
+						frm.submit();
 					},
 					fail : function(error) {
 						console.log(error);

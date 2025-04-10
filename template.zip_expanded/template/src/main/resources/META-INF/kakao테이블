@@ -1,0 +1,35 @@
+/*
+kakao2.jsp 회원테이블
+회원 테이블 (주소x) 
+1. 고유값 
+2. 아이디
+3. 이름 
+4. 닉네임 (카카오)
+5. 패스워드 (암호화 - MD5)
+6. 이메일  
+7. 연락처 (휴대폰) - 숫자만
+8. 가입 형태 - web, kakao, naver, google, facebook
+9. 가입일자 
+MCODE MJOIN 따로 둔 이유
+카카오로 로그인해서 추가정보 입력해서 web가입으로 돌릴때 처음 로그인 플랫폼 출력시 필요 
+*/
+
+CREATE TABLE MEMBERSHIP (
+MIDX NUMBER(3) NOT NULL, -- 어제 만든 시퀀스가 500까지라서 3으로 만듦 
+MCODE INTEGER DEFAULT '1' NOT NULL,
+MID NVARCHAR2(30) NOT NULL,	-- 플랫폼마다 id길이가 달라서 잘 생각하고 만들어야함
+MNAME NCHAR(10) NOT NULL,
+MNICK NVARCHAR2(100) NULL,	-- 페북닉네임이 유독 긺 / web 사용자는 닉없음 
+MPASS NVARCHAR2(100) NOT NULL,
+MEMAIL NVARCHAR2(50) NOT NULL,
+MHP NCHAR(11) NOT NULL,
+MJOIN NCHAR(10) NOT NULL,
+CONSTRAINT JOINPART CHECK(MJOIN IN('WEB','KAKAO','NAVER')),
+MDATE TIMESTAMP DEFAULT SYSDATE,
+PRIMARY KEY(MIDX),
+UNIQUE (MID),
+UNIQUE (MHP),
+UNIQUE (MEMAIL)
+);
+
+SELECT * FROM MEMBERSHIP;
