@@ -30,7 +30,7 @@
 <script>
 let kid = sessionStorage.getItem("mid");
 let knick = sessionStorage.getItem("knick");
-if(kid != ""){
+if(kid != null){	//!=""하면 안먹음 
 	document.querySelector("#ck").value = "ok";
 	document.querySelector("#idck").style.display = "none";
 	frm.MCODE.value = "2";

@@ -1,0 +1,89 @@
+/*
+[포인트 테이블 생성시 고려할 점]
+기획자 => COUPON => 할인율 or 포인트 or 적립금 => 컬럼 필요
+1. 할인율, 포인트 기능
+2. 쿠폰을 사용할 수 있는 날짜 제한 
+3. 해당 쿠폰을 사용할 수 있는 상품 설정  
+*/
+
+create table COUPON(
+MIDX NUMBER(3) NOT NULL,
+COUPON_NM NVARCHAR2(50) NOT NULL,
+COUPON_POINT NUMBER(6) NOT NULL,
+COUPON_DATE TIMESTAMP DEFAULT SYSDATE
+)
+
+
+/*
+트리거는 테이블 생성후 생성
+IDE에서 트리거 생성시 오류 발생함
+SQL developer에서 트리거 만들어야함 
+*/
+
+-- 아래 테이블 SQL developer에서 실행 후 커밋해서 실제테이블에 적용하기 
+CREATE OR REPLACE TRIGGER CP
+AFTER INSERT ON MEMBERSHIP
+FOR EACH ROW
+BEGIN
+INSERT INTO COUPON (MIDX,COUPON_NM,COUPON_POINT,COUPON_DATE)
+VALUES (:NEW.MIDX,'신규회원가입 쿠폰',1000,SYSDATE);
+END;
+
+-- 트리거 정지 
+ALTER TRIGGER CP DISABLE; 
+
+-- 트리거 재실행
+ALTER TRIGGER CP ENABLE; 
+
+-- drop trigger cp;		-- 트리거 삭제 
+
+-- 트리거 조회 
+SELECT TRIGGER_NAME FROM USER_TRIGGERS WHERE TABLE_NAME ='MEMBERSHIP';
+
+-- 쿠폰 조회 
+SELECT * FROM COUPON;
+
+/*
+Oracle Table JOIN시 주의점 on사용후 where 적용하기 
+1. JOIN ON WHERE
+2. JOIN ON
+3. JOIN , WHERE
+*/
+-- 조인해서 검색하기 ON
+SELECT A.MIDX, A.MCODE, A.MID, A.MNAME, A.MEMAIL, B.COUPON_NM
+FROM MEMBERSHIP A JOIN COUPON B ON A.MIDX = B.MIDX 
+WHERE A.MIDX='39';
+
+-- 조인해서 검색하기 WHERE
+-- 조인시 where을 바로 사용해야 할 경우 테이블과 테이블 사이에 콤마, 를 사용해 핸들링 
+SELECT A.MIDX, A.MCODE, A.MID, A.MNAME, A.MEMAIL, B.COUPON_NM
+FROM MEMBERSHIP A, COUPON B WHERE A.MIDX = B.MIDX;
+
+-- 뷰 생성 위 쿼리를 이용 
+CREATE VIEW USER_INFO AS SELECT A.MIDX, A.MCODE, A.MID, A.MNAME, A.MEMAIL, B.COUPON_NM
+FROM MEMBERSHIP A, COUPON B WHERE A.MIDX = B.MIDX;
+
+SELECT * FROM USER_INFO;	-- 검색 
+
+DROP VIEW USER_INFO;	-- 삭제 
+
+/*
+복구 백업 cmd로도 가능하지만 SQL developer로 해보기 
+[Oracle 백업]
+도구 > 데이터베이스 익스포트 
+> 접속 : 데이터베이스 선택 ,DDL익스포트 그대로, 버전 COMPATIBLE 그대로 냅두기
+데이터 익스포트 형식:insert그대로 인코딩 UTF-8 그대로
+파일 찾아보기눌러서 백업파일 저장할 경로 설정 
+> 다음 > 표준객체유형 모두, 확장객체유형 애들은 잘 안씀 (로그테이블 들고간다는뜻)
+> 다음 > 조회 클릭하면 모든 데이터가 나옴 거기서 뭘 가져갈건지 선택 (사진)
+> 다음 > 조회 클릭해서 확인, 전역 where 그냥 냅두기 (사수가 알아서 함)
+> 다음 > 익스포트 요약으로 마지막으로 확인 > 완료 
+
+[Oracle 복구]
+테이블트리 우클릭 > 데이터임포트 > 파일 찾아보기 백업해둔거 
+그런데! 아래 파일유형을 보면 .sql파일은 없음 .xls, .xlsx, csv, txt일때 사용 
+
+.sql 파일일때
+상단 툴바 > 파일 > 열기 .sql 파일 선택 > 열린 파일 좌상단 초록 삼각형 (실행버튼) 클 앵 안먹네 전체선택 우클릭 실행 
+ */
+

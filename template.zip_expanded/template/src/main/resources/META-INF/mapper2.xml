@@ -32,4 +32,28 @@ insert into membership (MIDX,MCODE,MID,MNAME,MNICK,MPASS,MEMAIL,MHP,MJOIN,MDATE)
 values (MNO.NEXTVAL,#{MCODE},#{MID},#{MNAME},#{MNICK},#{MPASS},#{MEMAIL},#{MHP},#{MJOIN},SYSDATE)
 </insert>
 
+ 
+<update id="id_update" parameterType="Map">
+update membership set 
+<choose>
+<when test="MPASS != null">		<!-- MPASS의 값이 있을 경우 -->
+MPASS = #{MPASS}, MHP = #{MHP}, MEMAIL = #{MEMAIL} 
+</when>
+<otherwise>		<!-- MPASS의 값이 없을 경우 -->
+MHP = #{MHP}, MEMAIL = #{MEMAIL} 
+</otherwise>
+</choose>
+where MID=#{MID}
+</update>
+
+
+
+
+
+
+
+
+
+
+
 </mapper>

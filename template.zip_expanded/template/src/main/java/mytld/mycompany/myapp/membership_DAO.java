@@ -57,4 +57,11 @@ public class membership_DAO implements membership_mapper {
 		result = st.insert("join_insert",dto);
 		return result;
 	}
+	
+	
+	@Override
+	public int id_update(Map<String, String> map) {
+		int result = this.st.update("id_update",map);
+		return result;
+	}
 }
